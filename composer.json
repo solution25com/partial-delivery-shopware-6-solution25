@@ -1,0 +1,26 @@
+{
+    "name": "s25/partial-delivery",
+    "description": "s25/partial-delivery",
+    "type": "shopware-platform-plugin",
+    "version": "1.0.0",
+    "license": "MIT",
+    "require": {
+        "shopware/core": "~6.6.0"
+    },
+    "extra": {
+        "shopware-plugin-class": "PartialDelivery\\PartialDelivery",
+        "label": {
+            "de-DE": "Partial Delivery"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "PartialDelivery\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PartialDelivery\\Tests\\": "tests/"
+        }
+    }
+}

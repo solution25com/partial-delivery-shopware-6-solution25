@@ -1,0 +1,79 @@
+{% block partial_shipment_create %}
+    <div class="shipment-container">
+     <sw-loader v-if="isLoading" size="large" class="shipment-loader" />
+     <template v-else>
+            <sw-button
+                v-if="shipments.length > 0 && !showCreateShipment"
+                variant="primary"
+                class="custom-save-all-bundles-button"
+                @click="toggleShipmentCreation">
+                Create Shipment
+            </sw-button>
+
+            <sw-order-detail-shipment-create 
+                v-if="showCreateShipment"
+                @close-shipment-form="toggleShipmentCreation"
+                @shipment-created="onShipmentCreated">
+            </sw-order-detail-shipment-create>
+            <sw-card  v-if="!hasPartialDelivery && !showCreateShipment">
+              <sw-button
+                variant="primary"
+                class="custom-save-all-bundles-button"
+                @click="toggleShipmentCreation">
+                Create Shipment
+            </sw-button>
+                <div class="no-shipments">
+                    No shipment details found for this order!
+                </div>
+            </sw-card>
+        <table  v-if="hasPartialDelivery && !showCreateShipment" class="sw-table">
+            <thead>
+            <tr>
+                <th>Prod. no.</th>
+                <th>Ordered</th>
+                <th>Canceled</th>
+                <th>Shipped</th>
+                <th>Shipment Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="shipment in shipments" :key="shipment.lineItemId">
+                <td>
+                    <div v-if="productDetails[shipment.productId]">
+                        {{ productDetails[shipment.productId].productNumber }} -
+                        {{ productDetails[shipment.productId].name }}
+                    </div>
+                </td>
+                <td>{{ shipment.quantityOrdered }}</td>
+
+                <td>
+                    {{ shipment.quantityLeft }}
+                </td>
+
+                <td>{{ shipment.quantityShipped }}</td>
+                <td>
+                    <table class="shipment-details">
+                        <thead>
+                        <tr>
+                            <th>Box</th>
+                            <th>Qty</th>
+                            <th>Tracking</th>
+                            <th>Created at</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(s, index) in shipment.shipments" :key="index">
+                            <td>{{ s.package }}</td>
+                            <td class="quantity">{{ s.quantity }}</td>
+                            <td>{{ s.trackingCode }}</td>
+                            <td>{{ formatDateTime(s.createdAt) }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </template>
+    </div>
+{% endblock %}

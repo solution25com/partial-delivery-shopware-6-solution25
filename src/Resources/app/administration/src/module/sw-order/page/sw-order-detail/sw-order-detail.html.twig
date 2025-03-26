@@ -1,0 +1,9 @@
+{% block sw_order_detail_content_tabs_documents %}
+    {% parent %}
+    <sw-tabs-item
+            :route="{ name: 'sw.order.detail.shipment' }"
+            :title="$tc('sw-order.detail.tabShipment')"
+    >
+        Shipments
+    </sw-tabs-item>
+{% endblock %}

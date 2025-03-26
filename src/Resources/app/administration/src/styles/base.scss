@@ -1,0 +1,40 @@
+.sw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: white;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.sw-table th, .sw-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+.sw-table th {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Styles for nested shipment details table */
+.shipment-details {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+  background: #f9f9f9;
+}
+
+.shipment-details th, .shipment-details td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ccc;
+  font-size: 13px;
+}
+
+.shipment-details th {
+  background: #f1f1f1;
+  font-weight: bold;
+}
