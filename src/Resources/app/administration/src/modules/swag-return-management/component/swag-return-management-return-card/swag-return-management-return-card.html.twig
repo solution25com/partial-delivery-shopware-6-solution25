@@ -1,0 +1,227 @@
+<sw-card
+    class="swag-return-management-return-card"
+    position-identifier="swag-return-management-return-card"
+    :title="cardTitle"
+>
+TEST
+    <template #header-right>
+        <sw-button
+            v-tooltip="{
+                message: $tc('sw-privileges.tooltip.warning'),
+                disabled: acl.can('order_return.deleter'),
+                showOnDisabledElements: true
+            }"
+            variant="ghost-danger"
+            size="small"
+            :disabled="!acl.can('order_return.deleter')"
+            @click="openDeleteReturnModal"
+        >
+            {{ $tc('global.default.delete') }}
+        </sw-button>
+    </template>
+
+    <div
+        v-if="!isLoading"
+        class="swag-return-management-return-card__header-description"
+    >
+        {{ cardDescription }}
+    </div>
+
+    <sw-tabs
+        v-show="!isLoading"
+        position-identifier="swag-return-management-return-card-tabs"
+        class="swag-return-management-return-card__tabs"
+        default-item="generalInformation"
+    >
+        <template #default="{ active }">
+            <sw-tabs-item
+                name="generalInformation"
+                :active-tab="active"
+            >
+                {{ $tc('swag-return-management.returnCard.generalTab.labelGeneralInformation') }}
+            </sw-tabs-item>
+
+            <sw-tabs-item
+                name="positions"
+                :active-tab="active"
+            >
+                {{ $tc('swag-return-management.returnCard.positionsTab.labelPositions') }}
+            </sw-tabs-item>
+
+            <sw-tabs-item
+                name="statusHistory"
+                :active-tab="active"
+            >
+                {{ $tc('swag-return-management.returnCard.statusTab.labelStatusHistory') }}
+            </sw-tabs-item>
+        </template>
+
+        <template #content="{ active }">
+            <template v-if="active === 'generalInformation'">
+                <sw-container
+                    columns="1fr 1fr"
+                    gap="32px"
+                    class="swag-return-management-return-card-general"
+                >
+                    <sw-container>
+                        <sw-order-state-select-v2
+                            v-tooltip="{
+                                message: $tc('sw-privileges.tooltip.warning'),
+                                disabled: acl.can('order_return.editor'),
+                                showOnDisabledElements: true
+                            }"
+                            class="swag-return-management-return-card__return-state"
+                            :transition-options="orderReturnStateOptions"
+                            rounded-style
+                            state-type="order-return"
+                            :placeholder="stateSelectPlaceholder"
+                            :label="$tc('swag-return-management.returnCard.generalTab.headlineOrderState')"
+                            :background-style="backgroundStyle('order_return')"
+                            :disabled="!acl.can('order_return.editor')"
+                            @state-select="onStateSelect"
+                        />
+
+                        <sw-textarea-field
+                            v-model:value="item.internalComment"
+                            class="swag-return-management-return-card__info-comment"
+                            :disabled="!acl.can('order_return.editor')"
+                            :label="$tc('swag-return-management.returnCard.generalTab.labelComment')"
+                            :placeholder="$tc('swag-return-management.returnCard.generalTab.placeholderComment')"
+                        />
+                    </sw-container>
+
+                    <sw-description-list
+                        class="swag-return-management-detail__summary"
+                        grid="1fr 1fr"
+                    >
+                        <dt>
+                            {{ $tc('swag-return-management.returnCard.generalTab.numberOfProducts') }}
+                        </dt>
+                        <dd>
+                            <strong>{{ returnLineItems.length }}</strong> {{ $tc('swag-return-management.returnCard.generalTab.items', totalItems, {total: totalItems}) }}
+                        </dd>
+
+                        <dt>{{ $tc('swag-return-management.returnCard.summaryLabelAmount') }}</dt>
+                        <dd>{{ currencyFilter(returnItem.price.positionPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</dd>
+
+                        <dt>{{ $tc('swag-return-management.returnCard.summaryLabelShippingCosts') }}</dt>
+                        <dd>
+                            {{ currencyFilter(returnItem.shippingCosts.totalPrice, order.currency.translated.shortName) }}
+                        </dd>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <dt><strong>{{ $tc('swag-return-management.returnCard.summaryLabelAmountWithoutTaxes') }}</strong></dt>
+                            <dd><strong>{{ currencyFilter(returnItem.price.netPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</strong></dd>
+                        </template>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <template
+                                v-for="(calculatedTax, index) in sortedCalculatedTaxes"
+                                :key="`sorted-calculated-taxes-${index}`"
+                            >
+                                <dt>
+                                    {{ $tc('swag-return-management.returnCard.summaryLabelTaxes', 1, { taxRate: calculatedTax.taxRate }) }}
+                                </dt>
+                                <dd>
+                                    {{ currencyFilter(calculatedTax.tax, order.currency.translated.shortName, order.totalRounding.decimals) }}
+                                </dd>
+                            </template>
+                        </template>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <dt><strong>{{ $tc('swag-return-management.returnCard.summaryLabelAmountTotal') }}</strong></dt>
+                            <dd><strong>{{ currencyFilter(returnItem.price.totalPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</strong></dd>
+                        </template>
+                    </sw-description-list>
+                </sw-container>
+            </template>
+
+            <template v-if="active === 'positions'">
+                <div
+                    class="swag-return-management-return-card-positions"
+                >
+                    <swag-return-management-return-line-items-grid
+                        :return-line-items="returnLineItems"
+                        :tax-status="taxStatus"
+                        :return-id="item.id"
+                        @reload-data="reloadData"
+                    />
+
+                    <sw-description-list
+                        v-if="returnLineItems.length > 0"
+                        class="swag-return-management-detail__summary"
+                        grid="1fr 1fr"
+                    >
+                        <dt>{{ $tc('sw-order.detailBase.summaryLabelAmount') }}</dt>
+                        <dd>{{ currencyFilter(returnItem.price.positionPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</dd>
+
+                        <dt>{{ $tc('swag-return-management.returnCard.summaryLabelShippingCosts') }}</dt>
+                        <dd>
+                            <sw-order-saveable-field
+                                v-tooltip="{
+                                    showDelay: 300,
+                                    message: shippingCostsDetail,
+                                    disabled: taxStatus === 'tax-free'
+                                }"
+                                type="number"
+                                :value="item.shippingCosts.totalPrice"
+                                :editable="acl.can('order_return.editor')"
+                                @value-change="onShippingChargeEdit"
+                            >
+                                {{ currencyFilter(returnItem.shippingCosts.totalPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}
+                            </sw-order-saveable-field>
+                        </dd>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <dt><strong>{{ $tc('swag-return-management.returnCard.summaryLabelAmountWithoutTaxes') }}</strong></dt>
+                            <dd><strong>{{ currencyFilter(returnItem.price.netPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</strong></dd>
+                        </template>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <template
+                                v-for="(calculatedTax, index) in sortedCalculatedTaxes"
+                                :key="`sorted-calculated-taxes-${index}`"
+                            >
+                                <dt>
+                                    {{ $tc('swag-return-management.returnCard.summaryLabelTaxes', 1, { taxRate: calculatedTax.taxRate }) }}
+                                </dt>
+                                <dd>
+                                    {{ currencyFilter(calculatedTax.tax, order.currency.translated.shortName, order.totalRounding.decimals) }}
+                                </dd>
+                            </template>
+                        </template>
+
+                        <template v-if="taxStatus !== 'tax-free'">
+                            <dt><strong>{{ $tc('swag-return-management.returnCard.summaryLabelAmountTotal') }}</strong></dt>
+                            <dd><strong>{{ currencyFilter(returnItem.price.totalPrice, order.currency.translated.shortName, order.totalRounding.decimals) }}</strong></dd>
+                        </template>
+                    </sw-description-list>
+                </div>
+            </template>
+
+            <template v-if="active === 'statusHistory'">
+                <swag-return-management-return-card-state-history
+                    :order-return="returnItem"
+                />
+            </template>
+
+        </template>
+    </sw-tabs>
+
+    <swag-return-management-delete-return-modal
+        v-if="showDeleteReturnModal && returnItem"
+        :order-return="returnItem"
+        @reload-data="reloadData"
+        @modal-close="onCloseDeleteReturnModal"
+    />
+
+    <sw-skeleton v-if="isLoading" />
+
+    <swag-return-management-change-return-state-modal
+        v-if="showChangeStatusModal"
+        :return-id="item.id"
+        :selected-state="selectedState"
+        @status-change="onReturnStateChange"
+        @modal-close="onCloseChangeStatusModal"
+    />
+</sw-card>

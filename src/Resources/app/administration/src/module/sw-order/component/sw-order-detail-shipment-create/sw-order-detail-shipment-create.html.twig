@@ -1,0 +1,69 @@
+<template>
+<sw-card>
+   <template #toolbar>
+        <sw-button
+            variant="ghost"
+            @click="$emit('close-shipment-form')"
+        >
+            Close Shipment Form
+        </sw-button>
+    </template>
+    <template #default>
+        <div class="shipment-form">
+            <sw-container>
+              <sw-data-grid
+                   :dataSource="orderLineItems"
+                    :columns="columns"
+                    selectionMode="multi"
+                    :showSelection="false"
+                    :allowInlineEdit="false"
+                    :showPagination="true"
+                    :limit="10"
+                    @selection-change="onSelectOrderLineItem"
+                >
+                    <template #column-select="{ item }">
+                     <input
+                        type="radio"
+                        name="shipmentItem"
+                        :value="item.id"
+                        v-model="shipmentData.orderLineItemId"
+                    />
+                    </template>
+                    <template #column-label="{ item }">
+                        {{ item.label || item.id }}
+                    </template>
+                    <template #column-quantity="{ item }">
+                        {{ item.quantity }}
+                    </template>
+                </sw-data-grid>
+
+                <sw-number-field
+                    v-model:value="shipmentData.quantity"
+                    label="Quantity"
+                    placeholder="Enter quantity"
+                    min="1"
+                ></sw-number-field>
+
+                <sw-text-field
+                    v-model:value="shipmentData.package"
+                    label="Package"
+                    placeholder="Enter package name"
+                ></sw-text-field>
+
+                <sw-text-field
+                    v-model:value="shipmentData.trackingCode"
+                    label="Tracking Code"
+                    placeholder="Enter tracking code"
+                ></sw-text-field>
+            </sw-container>
+        </div>
+    </template>
+
+    <template #footer>
+        <sw-button variant="primary" @click="createShipment">Create Shipment</sw-button>
+        <sw-button variant="secondary" @click="resetForm">Reset</sw-button>
+    </template>
+ 
+</sw-card>
+
+</template>

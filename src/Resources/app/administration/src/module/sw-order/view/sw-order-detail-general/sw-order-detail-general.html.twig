@@ -1,0 +1,55 @@
+{% block sw_order_detail_general_line_items_summary_amount_without_tax %}
+    <template v-if="taxStatus !== 'tax-free'">
+        <dt><strong>Total excluding Tax</strong></dt>
+        <dd><strong>{{ currencyFilter(order.amountNet, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+    </template>
+{% endblock %}
+
+{% block sw_order_detail_general_line_items_summary_taxes %}
+    <template v-if="taxStatus !== 'tax-free'">
+        <template v-for="(calculatedTax, index) in sortedCalculatedTaxes" :key="index">
+            <dt>plus {{ calculatedTax.taxRate }}% Tax</dt>
+            <dd>
+                {{ currencyFilter(calculatedTax.tax, currency.isoCode, order.totalRounding.decimals) }}
+            </dd>
+        </template>
+    </template>
+{% endblock %}
+
+{% block sw_order_detail_general_line_items_summary_amount_total %}
+    <template v-if="taxStatus !== 'tax-free'">
+        <dt><strong>Total including Tax</strong></dt>
+        <dd><strong>{{ currencyFilter(orderTotal, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+        <template v-if="displayRounded">
+            <dt><strong>{{ $tc('sw-order.detailBase.summaryLabelAmountTotalRounded') }}</strong></dt>
+            <dd><strong>{{ currencyFilter(order.price.totalPrice, currency.isoCode, order.totalRounding.decimals) }}</strong></dd>
+        </template>
+    </template>
+{% endblock %}
+{% block sw_order_detail_general_line_items_card %}
+    {% parent %}
+
+    <div class="my-custom-text">
+        <sw-card title="Order Return Data" class="my-custom-return-card">
+            <sw-single-select
+                :options="returnOptions"
+                v-model:value="selectedReturnId"
+                label-property="label"
+                value-property="id"
+                placeholder="Select a return"
+                class="refund-select"
+            />
+
+             <sw-button
+                variant="primary"
+                @click="onRefundClick"
+                :disabled="!selectedReturnId"
+                class="refund-button"
+            >
+                Refund Now
+            </sw-button>
+
+        </sw-card>
+    </div>
+{% endblock %}
+
