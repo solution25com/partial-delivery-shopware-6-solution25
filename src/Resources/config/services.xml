@@ -4,37 +4,44 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <services>
-        <service id= "PartialDelivery\Extension\OrderDeliveryPosition\PartialDeliveryExtension" public="true">
-            <tag name="shopware.entity.extension" />
-        </service>
+  <services>
+    <service id="PartialDelivery\Extension\OrderDeliveryPosition\PartialDeliveryExtension" public="true">
+      <tag name="shopware.entity.extension"/>
+    </service>
 
 
-        <service id="PartialDelivery\Core\Content\PartialDelivery\PartialDeliveryDefinition">
-            <tag name="shopware.entity.definition" entity="partial_delivery.repository"/>
-        </service>
+    <service id="PartialDelivery\Core\Content\PartialDelivery\PartialDeliveryDefinition">
+      <tag name="shopware.entity.definition" entity="partial_delivery.repository"/>
+    </service>
 
-        <service id="PartialDelivery\Service\OrderDeliveryPositionService">
-            <argument type="service" id="order_delivery_position.repository"/>
-        </service>
+    <service id="PartialDelivery\Service\OrderDeliveryPositionService">
+      <argument type="service" id="order_delivery_position.repository"/>
+    </service>
 
-        <service id="PartialDelivery\Controller\PartialDeliveryController" public="true">
-            <argument type="service" id="Doctrine\DBAL\Connection" />
-            <call method="setContainer">
-                <argument type="service" id="service_container" />
-            </call>
-            <tag name="controller.service_arguments"/>
-            <argument type="service" id="partial_delivery.repository"/>
-            <argument type="service" id="order_delivery_position.repository"/>
-            <argument type="service" id="order_line_item.repository"/>
-            <argument type="service" id="order.repository"/>
-            <argument type="service" id="order_delivery.repository"/>
-        </service>
+    <service id="PartialDelivery\Controller\PartialDeliveryController" public="true">
+      <argument type="service" id="Doctrine\DBAL\Connection"/>
+      <call method="setContainer">
+        <argument type="service" id="service_container"/>
+      </call>
+      <tag name="controller.service_arguments"/>
+      <argument type="service" id="partial_delivery.repository"/>
+      <argument type="service" id="order_delivery_position.repository"/>
+      <argument type="service" id="order_line_item.repository"/>
+      <argument type="service" id="order.repository"/>
+      <argument type="service" id="order_delivery.repository"/>
+    </service>
 
-        <service id="PartialDelivery\Core\Framework\Twig\ShipmentsTwigExtension">
-            <argument type="service" id="order_delivery.repository"/>
-            <argument type="service" id="partial_delivery.repository"/>
-            <tag name="twig.extension"/>
-        </service>
-    </services>
+    <service id="PartialDelivery\Core\Framework\Twig\ShipmentsTwigExtension">
+      <argument type="service" id="order_delivery.repository"/>
+      <argument type="service" id="partial_delivery.repository"/>
+      <tag name="twig.extension"/>
+    </service>
+
+    <service id="PartialDelivery\Decorate\OrderReturnRouteDecorated"
+             decorates="Shopware\Commercial\ReturnManagement\Domain\Returning\OrderReturnRoute"
+             decoration-inner-name="PartialDelivery\Decorate\OrderReturnRouteDecorated.inner"
+             autowire="true"
+             autoconfigure="true"/>
+
+  </services>
 </container>

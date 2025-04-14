@@ -1,3 +1,7 @@
+import {
+    LineItemStatus
+} from "../../../../../../../../../../SwagCommercial/src/ReturnManagement/Resources/app/administration/src/type/types";
+
 const { Component } = Shopware;
 
 Component.override('swag-return-management-create-return-modal', {
@@ -16,6 +20,9 @@ Component.override('swag-return-management-create-return-modal', {
             }, 0);
         
             return returnedQty >= lineItem.quantity;
+        },
+        hasInvalidStates(lineItem) {
+            return false
         },
         onSave() {
             this.isLoading = true;
