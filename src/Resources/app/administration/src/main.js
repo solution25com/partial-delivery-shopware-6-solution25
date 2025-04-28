@@ -2,7 +2,7 @@ import './module/sw-order/page/sw-order-detail';
 import './module/sw-order/page/sw-order-detail-shipment';
 import './modules/swag-return-management/component/swag-return-management-create-return-modal'
 import './modules/swag-return-management/component/swag-return-management-return-card'
-import './module/sw-order/component/sw-order-line-items-grid/index'
+// import './module/sw-order/component/sw-order-line-items-grid/index'
 import './module/sw-order/view/sw-order-detail-general/index'
 import './styles/base.scss'
 
