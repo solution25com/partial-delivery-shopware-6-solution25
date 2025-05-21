@@ -1,16 +1,36 @@
 {
     "name": "s25/partial-delivery",
-    "description": "s25/partial-delivery",
+    "description": "Partial Delivery - Shopware 6 Plugin",
     "type": "shopware-platform-plugin",
     "version": "1.0.0",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "solution25",
+            "email": "info@solution25.com",
+            "homepage": "https://solution25.com/"
+        }
+    ],
     "require": {
         "shopware/core": "~6.6.0"
     },
     "extra": {
         "shopware-plugin-class": "PartialDelivery\\PartialDelivery",
         "label": {
-            "de-DE": "Partial Delivery"
+            "de-DE": "Teil-Lieferung",
+            "en-GB": "Partial Delivery"
+        },
+        "description": {
+            "de-DE": "Plugin zur Unterstützung von Teillieferungen in Shopware",
+            "en-GB": "Plugin to support partial deliveries in Shopware"
+        },
+        "manufacturerLink": {
+            "de-DE": "https://solution25.com/",
+            "en-GB": "https://solution25.com/en/home_en/"
+        },
+        "supportLink": {
+            "de-DE": "https://solution25.com/",
+            "en-GB": "https://solution25.com/en/home_en/"
         }
     },
     "autoload": {
@@ -21,6 +41,11 @@
     "autoload-dev": {
         "psr-4": {
             "PartialDelivery\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
         }
     }
 }
