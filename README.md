@@ -117,7 +117,135 @@ This allows multiple packages to be associated with a single order.
 - **Data Cleanup**: Periodically review old shipment records to ensure clarity and accuracy in your order management.
 - **Test Before Use**: Try the partial delivery flow in a staging environment to confirm expected behavior before using it on live orders.
 ---
- 
+# Admin API Documentation
+
+This document describes the custom Admin API endpoints provided by the **Partial Delivery Plugin** for **Shopware 6**. These endpoints allow authorized users to **create** and **retrieve** partial shipment data associated with order line items.
+
+## 🔧 Create Partial Deliveries
+
+### Endpoint
+
+POST /api/_action/partial-shipment-delivery
+
+
+### Description
+
+Creates one or more partial delivery entries for specific `orderLineItemIds`. Each entry must include:
+
+- `quantity` to ship  
+- `package` name  
+- `trackingCode` for the shipment  
+
+The system validates:
+
+- Quantity does not exceed what’s remaining from the originally ordered quantity  
+- Valid `orderLineItemIds`  
+- Required fields are present  
+
+### Request Headers
+
+Authorization: Bearer <your-access-token>
+Content-Type: application/json
+
+
+### Example Request Body
+
+<pre>
+{
+  "partialDeliveries": [
+    {
+      "orderLineItemId": "0195a178f96b7345ad27051c34609e52",
+      "quantity": 4,
+      "package": "Package 6",
+      "trackingCode": "DHL12sad31e279"
+    },
+    {
+      "orderLineItemId": "0195a3aea0447296bc5377d49ab95c1e",
+      "quantity": 1,
+      "package": "Package 2",
+      "trackingCode": "1234ABCD789"
+    }
+  ]
+} </pre>
+
+Successful Response
+
+<pre>{
+  "insertedIds": [
+    "0195a178f96b7345ad27051c34609e52",
+    "0195a3aea0447296bc5377d49ab95c1e"
+  ],
+  "skippedItems": []
+}
+</pre>
+
+Example Error Response (Skipped Items)
+<pre>{
+  "insertedIds": [],
+  "skippedItems": [
+    {
+      "index": 0,
+      "orderLineItemId": "{{invalid-id}}",
+      "reason": "Invalid or missing orderLineItemId or the quantity exceeded"
+    }
+  ]
+}
+</pre>
+
+📦 Get Shipments by Order ID
+
+<pre>GET /api/_action/shipment/{orderId}
+</pre>
+
+Description
+Fetches all partial deliveries grouped by line item for a given order. Each result shows:
+
+- Line item ID
+
+- Ordered quantity
+
+- Associated shipment(s) with quantity, package, tracking code, and timestamp
+
+Example Request
+
+<pre>GET /api/_action/shipment/5b6a139e54e54ed7b7997c71f6f56f9e
+</pre>
+
+Example Response
+
+<pre>[
+  {
+    "lineItemId": "0195a3aea0447296bc5377d49ab95c1e",
+    "quantityOrdered": 3,
+    "shipments": [
+      {
+        "quantity": 1,
+        "package": "Package 2",
+        "trackingCode": "12334ASDAD9",
+        "createdAt": "2025-05-22T14:36:12+00:00"
+      }
+    ]
+  },
+  {
+    "lineItemId": "0195a178f96b7345ad27051c34609e52",
+    "quantityOrdered": 4,
+    "shipments": [
+      {
+        "quantity": 4,
+        "package": "Package 6",
+        "trackingCode": "DHL12sad31e279",
+        "createdAt": "2025-05-22T14:36:12+00:00"
+      }
+    ]
+  }
+]
+</pre>
+
+🔐 Authentication
+All endpoints require a valid Admin API Bearer token.
+You can obtain this token using the standard Shopware Admin API authentication process.
+
+---
 ## Troubleshooting
  
 - **Shipment Tab Not Visible in Admin?**  
