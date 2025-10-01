@@ -1,3 +1,7 @@
+[![Packagist Version](https://img.shields.io/packagist/v/solution25/partial-delivery.svg)](https://packagist.org/packages/solution25/partial-delivery)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/solution25/partial-delivery.svg)](https://packagist.org/packages/solution25/partial-delivery)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/solution25/PayTrace/blob/main/LICENSE)
+
 # Partial Delivery Plugin
  
 ## Introduction
@@ -281,3 +285,8 @@ You can obtain this token using the standard Shopware Admin API authentication p
  
 - **Do I need to install additional plugins to use the shipment features?**  
   - To use the full shipment functionality, ensure that the required dependencies, such as the Shopware Commercial extension, are installed and active.
+ 
+---
+
+
+#### Link to : [Wiki](https://github.com/solution25com/partial-delivery-shopware-6-solution25/wiki)
