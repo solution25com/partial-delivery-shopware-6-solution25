@@ -42,9 +42,15 @@ The **Partial Delivery** plugin for Shopware 6 enables merchants to manage and t
 ## Git
 - Clone the Plugin Repository:
 - Open your terminal and run the following command in your Shopware 6 custom plugins directory (usually located at custom/plugins/):
- 
-   ```bash
-   git clone https://github.com/solution25com/partial-delivery-shopware-6-solution25.git
+
+```bash
+git clone https://github.com/solution25com/partial-delivery-shopware-6-solution25.git
+```
+
+## Packagist
+
+ ```bash
+   composer require solution25/partial-delivery
    ```
  
 2. **Install the Plugin in Shopware 6**
