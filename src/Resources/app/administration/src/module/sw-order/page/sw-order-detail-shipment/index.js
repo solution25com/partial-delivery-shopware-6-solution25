@@ -1,18 +1,32 @@
 import template from './sw-order-detail-shipment.html.twig';
 import  '../../component/sw-order-detail-shipment-create'
+import  '../../component/sw-order-detail-shipment-update'
 
-const { Component } = Shopware;
+
+const { Component, Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 
 Component.register('sw-order-detail-shipment', {
     template,
-
+    inject: ['repositoryFactory'],
+    mixins: [Mixin.getByName('notification')],
     props: {
+        editShipment: {
+            type: Object,
+            required: false,
+            default: null
+        },
         orderId: {
             type: String,
             required: true
+        },
+        shipment: {
+            type: Object,
+            required: false,
+            default: null
         }
     },
+    
 
     data() {
         return {
@@ -20,6 +34,9 @@ Component.register('sw-order-detail-shipment', {
             productDetails: {},
             hasPartialDelivery: true,
             showCreateShipment: false, 
+            showUpdateShipment: false,
+            isEditMode: false,
+            shipmentBeingEdited: null,
             isLoading: false
         };
     },
@@ -29,6 +46,7 @@ Component.register('sw-order-detail-shipment', {
     },
 
     methods: {
+
         async loadShipments() {
             this.isLoading = true; 
         
@@ -88,6 +106,7 @@ Component.register('sw-order-detail-shipment', {
                 partialDeliveries.forEach(shipment => {
                     if (lineItems[shipment.orderLineItemId]) {
                         lineItems[shipment.orderLineItemId].shipments.push({
+                            id: shipment.id,
                             quantity: shipment.quantity,
                             package: shipment.package,
                             trackingCode: shipment.trackingCode,
@@ -105,16 +124,18 @@ Component.register('sw-order-detail-shipment', {
                 this.hasPartialDelivery = true;
         
                 this.shipments = Object.values(lineItems)
-                    .map(item => {
-                        const quantityShipped = item.shipments.reduce((sum, s) => sum + s.quantity, 0);
-                        return {
-                            ...item,
-                            productNumber: this.productDetails[item.productId]?.productNumber || '',
-                            quantityShipped,
-                            quantityLeft: item.quantityOrdered - quantityShipped
-                        };
-                    })
-                    .filter(item => item.shipments.length > 0);
+                .map(item => {
+                    const quantityShipped = item.shipments.reduce((sum, s) => sum + s.quantity, 0);
+                    return {
+                        ...item,
+                        productNumber: this.productDetails[item.productId]?.productNumber || '',
+                        quantityShipped,
+                        quantityLeft: item.quantityOrdered - quantityShipped
+                    };
+                })
+                .filter(item => item.shipments.length > 0);
+                console.log('Loaded shipments:', this.shipments);
+
         
             } catch (error) {
                 console.error('Error loading shipments:', error);
@@ -131,11 +152,65 @@ Component.register('sw-order-detail-shipment', {
         },
         toggleShipmentCreation() {
             this.showCreateShipment = !this.showCreateShipment;
+        }, 
+        toggleShipmentUpdate() {
+            this.showUpdateShipment = !this.showUpdateShipment;
         },
+        async deleteShipment(shipmentToDelete, lineItemId) {
+            try {
+                if (!shipmentToDelete.id) {
+                    this.createNotificationError({
+                        title: 'Delete Failed',
+                        message: 'Shipment ID missing.'
+                    });
+                    return;
+                }
+        
+                const response = await Shopware.Service('repositoryFactory').httpClient.post(
+                    `/_action/partial-shipment-delivery/delete/${shipmentToDelete.id}`,
+                    {}, 
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Shopware.Context.api.authToken.access}`,
+                        }
+                    }
+                );
+        
+                this.createNotificationSuccess({
+                    title: 'Success',
+                    message: response.data.message || 'Shipment deleted successfully.'
+                });
+        
+                await this.loadShipments();
+            } catch (error) {
+                console.error('Error deleting shipment:', error);
+                this.createNotificationError({
+                    title: 'Delete Error',
+                    message: error.message || 'An error occurred while deleting the shipment.'
+                });
+            }
+        },        
+        startShipmentEdit(shipment, lineItem) {
+            this.shipmentBeingEdited = {
+                ...shipment,
+                orderLineItemId: lineItem.id, 
+                quantity: shipment.quantity || 0,
+                package: shipment.package || '',
+                trackingCode: shipment.trackingCode || '',
+            };
+        
+            this.showUpdateShipment = true;
+        },        
+        
         async onShipmentCreated() {
-            // this.showCreateShipment = false;
             this.shipments = [];
             await this.loadShipments();
+            this.showCreateShipment = false;
+        },
+        async onShipmentUpdated() {
+            this.shipments = [];
+            await this.loadShipments();
+            this.showUpdateShipment = false;
         }
     }
 });

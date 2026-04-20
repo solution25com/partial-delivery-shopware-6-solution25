@@ -26,4 +26,9 @@ class PartialDeliveryExtension extends EntityExtension
     {
         return OrderLineItemDefinition::class;
     }
+
+    public function getEntityName(): string
+    {
+      return 'partial_delivery';
+    }
 }

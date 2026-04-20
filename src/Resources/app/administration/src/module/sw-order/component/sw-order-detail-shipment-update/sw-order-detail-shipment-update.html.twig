@@ -1,0 +1,43 @@
+ <sw-card class="full-width-card">
+    <template #toolbar>
+      <sw-button
+        variant="secondary"
+        class="partialDelivery_close_shipments"
+        @click="$emit('close-shipment-form')"
+      >
+        Close Shipment Form
+      </sw-button>
+    </template>
+
+    <template #default>
+      <div class="shipment-form">
+        <sw-container>
+          <sw-number-field
+            v-model:value="shipmentData.quantity"
+            label="Quantity"
+            placeholder="Enter quantity"
+            :min="0"
+          ></sw-number-field>
+
+          <sw-text-field
+            v-model:value="shipmentData.package"
+            label="Package"
+            placeholder="Enter package name"
+          ></sw-text-field>
+
+          <sw-text-field
+            v-model:value="shipmentData.trackingCode"
+            label="Tracking Code"
+            placeholder="Enter tracking code"
+          ></sw-text-field>
+        </sw-container>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="partialDelivery_footer_buttons">
+        <sw-button variant="primary" @click="updateShipment">Update Shipment</sw-button>
+        <sw-button variant="secondary" @click="resetForm">Reset</sw-button>
+      </div>
+    </template>
+  </sw-card>

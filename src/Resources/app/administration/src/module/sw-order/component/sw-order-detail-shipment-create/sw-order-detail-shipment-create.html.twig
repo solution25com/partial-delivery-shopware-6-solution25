@@ -1,8 +1,8 @@
-<template>
-<sw-card>
+<sw-card class="full-width-card">
    <template #toolbar>
         <sw-button
-            variant="ghost"
+            variant="secondary"
+            class="partialDelivery_close_shipments"
             @click="$emit('close-shipment-form')"
         >
             Close Shipment Form
@@ -41,7 +41,7 @@
                     v-model:value="shipmentData.quantity"
                     label="Quantity"
                     placeholder="Enter quantity"
-                    min="1"
+                    min="0"
                 ></sw-number-field>
 
                 <sw-text-field
@@ -60,10 +60,10 @@
     </template>
 
     <template #footer>
+      <div class="partialDelivery_footer_buttons">
         <sw-button variant="primary" @click="createShipment">Create Shipment</sw-button>
         <sw-button variant="secondary" @click="resetForm">Reset</sw-button>
+      </div>
     </template>
  
 </sw-card>
-
-</template>

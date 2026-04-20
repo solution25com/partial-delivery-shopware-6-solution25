@@ -1,6 +1,6 @@
 import template from './sw-order-detail-shipment-create.html.twig';
-import { Component, Mixin } from 'Shopware';
 
+const { Component, Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 
 Component.register('sw-order-detail-shipment-create', {
@@ -29,6 +29,7 @@ Component.register('sw-order-detail-shipment-create', {
                     allowResize: false,
                 },
                 { property: 'label', label: 'Item'},
+                { property: 'product.productNumber', label: 'SKU' },
                 { property: 'quantity', label: 'Available Quantity'},
             ],
         };
@@ -45,17 +46,29 @@ Component.register('sw-order-detail-shipment-create', {
             if (!this.orderId) {
                 return;
             }
-
+        
             const criteria = new Criteria();
             criteria.addFilter(Criteria.equals('orderId', this.orderId));
-            criteria.setLimit(10);
-
+        
+            criteria.addFilter(Criteria.not('OR', [
+                Criteria.equals('productId', null)
+            ]));
+        
+            criteria.addAssociation('product');
+        
+            criteria.setLimit(50); 
+        
             try {
                 this.orderLineItems = await this.orderLineItemRepository.search(criteria, Shopware.Context.api);
             } catch (error) {
                 console.error('Error fetching order line items:', error);
+                this.createNotificationError({
+                    title: 'Error loading items',
+                    message: error.message
+                });
             }
-        },
+        }
+        ,
 
         onSelectOrderLineItem(selection) {
             const selectedKeys = Object.keys(selection);

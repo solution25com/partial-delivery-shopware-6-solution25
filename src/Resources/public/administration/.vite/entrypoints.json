@@ -1,0 +1,25 @@
+{
+  "base": "/bundles/partialdelivery/administration/",
+  "entryPoints": {
+    "partial-delivery": {
+      "css": [
+        "/bundles/partialdelivery/administration/assets/partial-delivery-BTkgHWpo.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/bundles/partialdelivery/administration/assets/partial-delivery-CN_aI9-q.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}
