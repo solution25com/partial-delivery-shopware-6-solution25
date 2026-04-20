@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-04-20
+### Added
+- **Compatibility with Shopware 6.7**
+### Fixed
+- **Shipment form still showing after submitting it** 
+
+---
+
+
 ## [1.0.0] - 2025-05-20
 ### Key Features
 - **Partial Shipment Management**
