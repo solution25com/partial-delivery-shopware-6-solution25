@@ -25,7 +25,8 @@ The **Partial Delivery** plugin for Shopware 6 enables merchants to manage and t
 ---
 
 ## Compatibility
-- ✅ Shopware 6.6.x 
+- ✅ Shopware 6.6.x
+- ✅ Shopware 6.7.x 
  
 ## Get Started
  
