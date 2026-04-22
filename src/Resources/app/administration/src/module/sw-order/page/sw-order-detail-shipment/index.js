@@ -37,6 +37,7 @@ Component.register('sw-order-detail-shipment', {
             showUpdateShipment: false,
             isEditMode: false,
             shipmentBeingEdited: null,
+            shipmentPendingDeletion: null,
             isLoading: false
         };
     },
@@ -76,6 +77,7 @@ Component.register('sw-order-detail-shipment', {
                     if (item.productId) {
                         productIds.push(item.productId);
                         lineItems[item.id] = {
+                            lineItemId: item.id,
                             productId: item.productId,
                             productName: item.label,
                             quantityOrdered: item.quantity,
@@ -156,8 +158,16 @@ Component.register('sw-order-detail-shipment', {
         toggleShipmentUpdate() {
             this.showUpdateShipment = !this.showUpdateShipment;
         },
-        async deleteShipment(shipmentToDelete, lineItemId) {
+        promptDeleteShipment(shipmentToDelete) {
+            this.shipmentPendingDeletion = shipmentToDelete;
+        },
+        closeDeleteModal() {
+            this.shipmentPendingDeletion = null;
+        },
+        async deleteShipment() {
             try {
+                const shipmentToDelete = this.shipmentPendingDeletion;
+
                 if (!shipmentToDelete.id) {
                     this.createNotificationError({
                         title: 'Delete Failed',
@@ -182,6 +192,7 @@ Component.register('sw-order-detail-shipment', {
                 });
         
                 await this.loadShipments();
+                this.closeDeleteModal();
             } catch (error) {
                 console.error('Error deleting shipment:', error);
                 this.createNotificationError({
@@ -193,7 +204,7 @@ Component.register('sw-order-detail-shipment', {
         startShipmentEdit(shipment, lineItem) {
             this.shipmentBeingEdited = {
                 ...shipment,
-                orderLineItemId: lineItem.id, 
+                orderLineItemId: lineItem.lineItemId, 
                 quantity: shipment.quantity || 0,
                 package: shipment.package || '',
                 trackingCode: shipment.trackingCode || '',

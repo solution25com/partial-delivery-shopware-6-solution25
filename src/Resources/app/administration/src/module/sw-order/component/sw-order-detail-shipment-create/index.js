@@ -3,6 +3,13 @@ import template from './sw-order-detail-shipment-create.html.twig';
 const { Component, Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 
+const createEmptyShipmentData = () => ({
+    orderLineItemId: '',
+    quantity: 0,
+    package: '',
+    trackingCode: '',
+});
+
 Component.register('sw-order-detail-shipment-create', {
     template,
 
@@ -15,12 +22,8 @@ Component.register('sw-order-detail-shipment-create', {
             orderId: this.$route.params.id, 
             orderLineItems: [],
             selectedOrderLineItem: null,
-            shipmentData: {
-                orderLineItemId: '',
-                quantity: 0,
-                package: '',
-                trackingCode: '',
-            },
+            shipmentData: createEmptyShipmentData(),
+            formResetKey: 0,
             columns: [
                 {
                     property: 'select',
@@ -139,12 +142,8 @@ Component.register('sw-order-detail-shipment-create', {
         },        
 
         resetForm() {
-            this.shipmentData = {
-                orderLineItemId: '',
-                quantity: 0,
-                package: '',
-                trackingCode: '',
-            };
+            this.shipmentData = createEmptyShipmentData();
+            this.formResetKey += 1;
         },
     
     },

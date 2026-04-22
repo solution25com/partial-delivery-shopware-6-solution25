@@ -10,9 +10,10 @@
     </template>
 
     <template #default>
-      <div class="shipment-form">
+      <div :key="formResetKey" class="shipment-form">
         <sw-container>
           <sw-number-field
+            :key="`quantity-${formResetKey}`"
             v-model:value="shipmentData.quantity"
             label="Quantity"
             placeholder="Enter quantity"
@@ -20,12 +21,14 @@
           ></sw-number-field>
 
           <sw-text-field
+            :key="`package-${formResetKey}`"
             v-model:value="shipmentData.package"
             label="Package"
             placeholder="Enter package name"
           ></sw-text-field>
 
           <sw-text-field
+            :key="`tracking-${formResetKey}`"
             v-model:value="shipmentData.trackingCode"
             label="Tracking Code"
             placeholder="Enter tracking code"

@@ -3,11 +3,11 @@
   "entryPoints": {
     "partial-delivery": {
       "css": [
-        "/bundles/partialdelivery/administration/assets/partial-delivery-BTkgHWpo.css"
+        "/bundles/partialdelivery/administration/assets/partial-delivery-Cj3MvHGR.css"
       ],
       "dynamic": [],
       "js": [
-        "/bundles/partialdelivery/administration/assets/partial-delivery-CN_aI9-q.js"
+        "/bundles/partialdelivery/administration/assets/partial-delivery-C-Er2Xwh.js"
       ],
       "legacy": false,
       "preload": []

@@ -79,7 +79,7 @@
 											>
 												Edit
 											</sw-button>
-											<sw-button variant="danger" class="partialDelivery_delete_shipments" size="small" @click="deleteShipment(s, shipment.lineItemId)">
+											<sw-button variant="danger" class="partialDelivery_delete_shipments" size="small" @click="promptDeleteShipment(s)">
 												Delete
 											</sw-button>
 										</td>
@@ -90,6 +90,24 @@
 					</tr>
 				</tbody>
 			</table>
+
+			<sw-modal
+				v-if="shipmentPendingDeletion"
+				title="Delete shipment"
+				variant="small"
+				@modal-close="closeDeleteModal"
+			>
+				<p>Are you sure you want to delete this shipment?</p>
+
+				<template #modal-footer>
+					<sw-button variant="secondary" @click="closeDeleteModal">
+						Cancel
+					</sw-button>
+					<sw-button class="partialDelivery_delete_shipments" variant="danger" @click="deleteShipment">
+						Delete shipment
+					</sw-button>
+				</template>
+			</sw-modal>
 		</template>
 	</div>
 {% endblock %}

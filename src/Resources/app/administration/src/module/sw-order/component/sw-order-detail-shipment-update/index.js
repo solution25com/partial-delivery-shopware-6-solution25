@@ -3,6 +3,13 @@ import template from './sw-order-detail-shipment-update.html.twig';
 const { Component, Mixin } = Shopware;
 const { Criteria } = Shopware.Data;
 
+const createShipmentDataFromShipment = (shipment = {}) => ({
+    orderLineItemId: shipment.orderLineItemId || '',
+    quantity: shipment.quantity || 0,
+    package: shipment.package || '',
+    trackingCode: shipment.trackingCode || '',
+});
+
 Component.register('sw-order-detail-shipment-update', {
   template,
 
@@ -21,12 +28,9 @@ Component.register('sw-order-detail-shipment-update', {
     return {
       orderLineItems: [],
       selectedOrderLineItem: null,
-      shipmentData: {
-        orderLineItemId: this.shipment.orderLineItemId || '',
-        quantity: this.shipment.quantity || 0,
-        package: this.shipment.package || '',
-        trackingCode: this.shipment.trackingCode || '',
-    },
+      shipmentData: createShipmentDataFromShipment(this.shipment),
+      initialShipmentData: createShipmentDataFromShipment(this.shipment),
+      formResetKey: 0,
       columns: [
         {
           property: 'select',
@@ -103,12 +107,9 @@ Component.register('sw-order-detail-shipment-update', {
             );
     
             if (response?.data) {
-                this.shipmentData = {
-                    orderLineItemId: response.data.orderLineItemId,
-                    quantity: response.data.quantity,
-                    package: response.data.package,
-                    trackingCode: response.data.trackingCode,
-                };
+                const shipmentData = createShipmentDataFromShipment(response.data);
+                this.shipmentData = shipmentData;
+                this.initialShipmentData = { ...shipmentData };
     
                 console.log('Fetched Order Line Item ID:', this.shipmentData.orderLineItemId);
             }
@@ -176,13 +177,14 @@ Component.register('sw-order-detail-shipment-update', {
         }
     },
 
-    // resetForm() {
-    //   this.shipmentData = {
-    //     orderLineItemId: '',
-    //     quantity: 0,
-    //     package: '',
-    //     trackingCode: '',
-    //   };
-    // },
+    resetForm() {
+        this.shipmentData = {
+            orderLineItemId: this.initialShipmentData.orderLineItemId || this.shipmentData.orderLineItemId,
+            quantity: 0,
+            package: '',
+            trackingCode: '',
+        };
+        this.formResetKey += 1;
+    },
   },
 });

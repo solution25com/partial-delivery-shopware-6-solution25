@@ -9,7 +9,7 @@
         </sw-button>
     </template>
     <template #default>
-        <div class="shipment-form">
+        <div :key="formResetKey" class="shipment-form">
             <sw-container>
               <sw-data-grid
                    :dataSource="orderLineItems"

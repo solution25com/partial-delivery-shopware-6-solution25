@@ -2,11 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-04-22
+
+### Fixed
+- **Reset button not working when creating a shipment**
+- **Reset button not working when editing a shipment**
+
+### Added
+- **Confirmation dialog when deleting a shipment**
+---
+
 ## [1.1.0] - 2026-04-20
 ### Added
 - **Compatibility with Shopware 6.7**
 ### Fixed
-- **Shipment form still showing after submitting it** 
+- **Shipment form still showing after submitting it**
 
 ---
 
