@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-07-14
+### Added
+- Added a generic Integration API for external systems to create, update, list, and capture partial deliveries
+- Added idempotent payment capture support
+- Added payment provider interface for registering capture handlers
+- Added capture lifecycle events for audit and reconciliation
+- Added configurable capture update policy for already-captured deliveries
+- Added integration fields to partial delivery records
+- Added integration documentation and Postman collection
+
+### Changed
+- Migrated persistence layer to Shopware DAL
+- Legacy admin UI endpoints remain unchanged and fully backward compatible
+
 ## [1.1.1] - 2026-04-22
 
 ### Fixed
