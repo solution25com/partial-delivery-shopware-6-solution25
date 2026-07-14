@@ -114,7 +114,7 @@ Component.override('sw-order-detail-general', {
       }
 
       try {
-        const response = await Shopware.Service('repositoryFactory').httpClient.post(
+        await Shopware.Service('repositoryFactory').httpClient.post(
           '/refund',
           {
             orderId: this.orderId,

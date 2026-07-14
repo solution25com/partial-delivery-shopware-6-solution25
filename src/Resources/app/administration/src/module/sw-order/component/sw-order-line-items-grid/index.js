@@ -3,12 +3,10 @@ const {Component} = Shopware;
 
 Component.override('sw-order-line-items-grid', {
   created() {
-    console.log('[DEBUG] sw-order-line-items-grid override: created hook');
   },
 
   computed: {
     unitPriceLabel() {
-      console.log('[DEBUG] sw-order-line-items-grid override: unitPriceLabel method called. Tax status:', this.taxStatus);
 
       if (this.taxStatus === 'net') {
         return this.$tc('Unit Price');

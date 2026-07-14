@@ -110,8 +110,6 @@ Component.register('sw-order-detail-shipment-update', {
                 const shipmentData = createShipmentDataFromShipment(response.data);
                 this.shipmentData = shipmentData;
                 this.initialShipmentData = { ...shipmentData };
-    
-                console.log('Fetched Order Line Item ID:', this.shipmentData.orderLineItemId);
             }
         } catch (error) {
             console.error('Failed to fetch shipment details', error);
@@ -127,7 +125,6 @@ Component.register('sw-order-detail-shipment-update', {
             });
             return;
         }
-        console.log('Order Line Item ID:', this.shipmentData.orderLineItemId); // 👈 Add this line
 
         const payload = {
             partialDeliveries: [

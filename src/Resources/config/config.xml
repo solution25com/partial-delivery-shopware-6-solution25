@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+    <card>
+        <title>Partial Delivery</title>
+        <title lang="de-DE">Teil-Lieferung</title>
+
+        <input-field type="single-select">
+            <name>captureUpdatePolicy</name>
+            <label>Capture update policy</label>
+            <label lang="de-DE">Capture-Update-Richtlinie</label>
+            <helpText>What happens when an update changes the quantity or amount of a partial delivery whose payment was already captured. Capture itself is always idempotent (it never re-charges already-captured deliveries); this setting only governs editing an already-captured row.</helpText>
+            <defaultValue>protect</defaultValue>
+            <options>
+                <option>
+                    <id>protect</id>
+                    <name>Protect — reject financial changes to already-captured deliveries</name>
+                    <name lang="de-DE">Schützen — finanzielle Änderungen an bereits erfassten Lieferungen ablehnen</name>
+                </option>
+                <option>
+                    <id>flag</id>
+                    <name>Flag — allow the change, mark it for reconciliation and dispatch an event (no automatic charge)</name>
+                    <name lang="de-DE">Markieren — Änderung zulassen, zur Abstimmung markieren und Event auslösen (keine automatische Belastung)</name>
+                </option>
+            </options>
+        </input-field>
+    </card>
+</config>

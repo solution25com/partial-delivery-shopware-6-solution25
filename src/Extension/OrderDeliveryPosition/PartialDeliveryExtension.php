@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace PartialDelivery\Extension\OrderDeliveryPosition;
 
@@ -8,7 +10,6 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\OneToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemDefinition;
-
 
 class PartialDeliveryExtension extends EntityExtension
 {
@@ -29,6 +30,6 @@ class PartialDeliveryExtension extends EntityExtension
 
     public function getEntityName(): string
     {
-      return 'partial_delivery';
+        return 'partial_delivery';
     }
 }

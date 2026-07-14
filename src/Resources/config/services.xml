@@ -14,12 +14,33 @@
       <tag name="shopware.entity.definition" entity="partial_delivery.repository"/>
     </service>
 
-    <service id="PartialDelivery\Service\OrderDeliveryPositionService">
-      <argument type="service" id="order_delivery_position.repository"/>
+    <service id="PartialDelivery\Payment\NullPaymentCaptureHandler">
+      <tag name="partial_delivery.payment_capture" priority="-1000"/>
+    </service>
+
+    <service id="PartialDelivery\Service\PartialDeliveryCaptureRegistry">
+      <argument type="tagged_iterator" tag="partial_delivery.payment_capture"/>
+    </service>
+
+
+    <service id="PartialDelivery\Service\PartialDeliveryService" public="true">
+      <argument type="service" id="partial_delivery.repository"/>
+      <argument type="service" id="order.repository"/>
+      <argument type="service" id="order_line_item.repository"/>
+      <argument type="service" id="PartialDelivery\Service\PartialDeliveryCaptureRegistry"/>
+      <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+      <argument type="service" id="event_dispatcher"/>
+    </service>
+
+    <service id="PartialDelivery\Controller\PartialDeliveryIntegrationController" public="true">
+      <argument type="service" id="PartialDelivery\Service\PartialDeliveryService"/>
+      <call method="setContainer">
+        <argument type="service" id="service_container"/>
+      </call>
+      <tag name="controller.service_arguments"/>
     </service>
 
     <service id="PartialDelivery\Controller\PartialDeliveryController" public="true">
-      <argument type="service" id="Doctrine\DBAL\Connection"/>
       <call method="setContainer">
         <argument type="service" id="service_container"/>
       </call>
@@ -29,6 +50,7 @@
       <argument type="service" id="order_line_item.repository"/>
       <argument type="service" id="order.repository"/>
       <argument type="service" id="order_delivery.repository"/>
+      <argument type="service" id="PartialDelivery\Service\PartialDeliveryService"/>
     </service>
 
     <service id="PartialDelivery\Core\Framework\Twig\ShipmentsTwigExtension">

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace PartialDelivery\Migration;
 
@@ -12,14 +14,14 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 #[Package('core')]
 class Migration1739523261PartialDelivery extends MigrationStep
 {
-  public function getCreationTimestamp(): int
-  {
-    return 1739523261;
-  }
+    public function getCreationTimestamp(): int
+    {
+        return 1739523261;
+    }
 
-  public function update(Connection $connection): void
-  {
-    $connection->executeStatement("
+    public function update(Connection $connection): void
+    {
+        $connection->executeStatement("
             CREATE TABLE IF NOT EXISTS partial_delivery (
                 id BINARY(16) NOT NULL,
                 order_line_item_id VARCHAR(255) NOT NULL,
@@ -31,5 +33,5 @@ class Migration1739523261PartialDelivery extends MigrationStep
                 PRIMARY KEY (id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ");
-  }
+    }
 }

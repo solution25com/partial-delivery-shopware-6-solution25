@@ -133,7 +133,7 @@ Component.register('sw-order-detail-shipment-create', {
                     });
                 }
         
-            } catch (error) {
+            } catch {
                 this.createNotificationError({
                     title: 'Shipment Error',
                     message: 'An error occurred while creating the shipment. Please try again.',

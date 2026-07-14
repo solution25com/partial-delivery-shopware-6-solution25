@@ -1,0 +1,306 @@
+{
+  "info": {
+    "name": "Partial Delivery — Shopware 6 (solution25)",
+    "_postman_id": "b2f6e9c0-7a1d-4d2e-9c3b-partial-delivery",
+    "description": "Admin API endpoints for the Partial Delivery plugin.\n\n**Setup**\n1. Set the `baseUrl` variable to your shop (no trailing slash), e.g. `https://your-shop.example`.\n2. Create an Admin API integration in `Settings → System → Integrations` and put its key/secret in `clientId`/`clientSecret`, OR use the password-grant request with `username`/`password`.\n3. Run **Auth → Get token** once — it stores `accessToken` automatically. All other requests inherit it via collection-level Bearer auth.\n4. Set `orderId` and `orderLineItemId` (and/or `orderNumber`/`productNumber`) to real values from your shop.\n\n**ACL:** the integration write/read routes enforce `_acl` (`partial_delivery:create` / `:update` / `:read`). Admin users bypass ACL; an integration must be granted a role with those `partial_delivery` privileges. See `INTEGRATION.md` for full details.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://your-shop.example", "type": "string" },
+    { "key": "clientId", "value": "", "type": "string" },
+    { "key": "clientSecret", "value": "", "type": "string" },
+    { "key": "username", "value": "admin", "type": "string" },
+    { "key": "password", "value": "shopware", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "orderId", "value": "", "type": "string" },
+    { "key": "orderLineItemId", "value": "", "type": "string" },
+    { "key": "orderNumber", "value": "10029", "type": "string" },
+    { "key": "productNumber", "value": "SKU-001", "type": "string" },
+    { "key": "partialDeliveryId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Get token (integration / client_credentials)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "  pm.test('access_token stored', () => pm.expect(json.access_token).to.be.a('string'));",
+                  "} else {",
+                  "  pm.test('access_token present', () => pm.expect.fail('no access_token in response'));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{clientId}}\",\n  \"client_secret\": \"{{clientSecret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/oauth/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "oauth", "token"]
+            },
+            "description": "Recommended for ERP/middleware. Uses an Admin API integration's access key id and secret."
+          }
+        },
+        {
+          "name": "Get token (admin user / password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('accessToken', json.access_token);",
+                  "  pm.test('access_token stored', () => pm.expect(json.access_token).to.be.a('string'));",
+                  "} else {",
+                  "  pm.test('access_token present', () => pm.expect.fail('no access_token in response'));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"password\",\n  \"client_id\": \"administration\",\n  \"scopes\": \"write\",\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/oauth/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "oauth", "token"]
+            },
+            "description": "Convenience for manual testing with an admin user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Partial Delivery (Integration API)",
+      "item": [
+        {
+          "name": "Create shipments (by orderLineItemId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201 or 422', () => pm.expect([201, 422]).to.include(pm.response.code));",
+                  "const json = pm.response.json();",
+                  "if (json.created && json.created.length) {",
+                  "  pm.collectionVariables.set('partialDeliveryId', json.created[0].partialDeliveryId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"exact-online\",\n  \"externalReference\": \"ERP-DELIVERY-123\",\n  \"shipments\": [\n    {\n      \"orderLineItemId\": \"{{orderLineItemId}}\",\n      \"quantity\": 1,\n      \"package\": \"Box 1\",\n      \"trackingCode\": \"DHL-00123\",\n      \"amount\": 49.95\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/shipments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "shipments"]
+            },
+            "description": "Create one or more partial deliveries. Identify a line by `orderLineItemId`. `201` if at least one row is created; per-item failures returned in `skipped`."
+          }
+        },
+        {
+          "name": "Create shipments (by orderNumber + productNumber)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"core\",\n  \"shipments\": [\n    {\n      \"orderNumber\": \"{{orderNumber}}\",\n      \"productNumber\": \"{{productNumber}}\",\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/shipments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "shipments"]
+            },
+            "description": "Resolve the line item by SKU within an order when you don't have the Shopware line item UUID."
+          }
+        },
+        {
+          "name": "Update shipment (DAL, by id)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2,\n  \"package\": \"Box B\",\n  \"trackingCode\": \"DHL-00999\",\n  \"amount\": 39.90\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/shipments/{{partialDeliveryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "shipments", "{{partialDeliveryId}}"]
+            },
+            "description": "Shopware-6-way update via the DAL. Send only the fields you want to change (any of quantity, package, trackingCode, amount, source, externalReference). `quantity` is validated against the line item's remaining quantity (excluding this row). Returns `200` on success, `422` for invalid quantity, `404` if the id does not exist. Requires the `partial_delivery:update` ACL privilege.\n\nEditing an ALREADY-CAPTURED delivery is governed by the captureUpdatePolicy plugin config: `protect` (default) rejects financial changes (quantity/amount) with 422 but allows logistics fields (package/trackingCode); `flag` allows it, marks the row adjustment_required and dispatches an event (no auto-charge)."
+          }
+        },
+        {
+          "name": "List partial deliveries by order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/order/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "order", "{{orderId}}"]
+            },
+            "description": "Returns deliveries grouped per line item with ordered/delivered/remaining quantities and payment status."
+          }
+        },
+        {
+          "name": "Capture (whole order)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"amount\": 49.95,\n  \"currency\": \"EUR\",\n  \"externalReference\": \"ERP-DELIVERY-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/capture",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "capture"]
+            },
+            "description": "Provider-agnostic capture. Returns `captured` / `requested` / `failed` / `unsupported`. Without a registered provider handler it is a safe no-op (`unsupported`). Idempotent: only not-yet-captured deliveries are processed, so re-calling never re-charges already-captured rows (ship+capture 2 of 3, then later the 3rd → only the 3rd is charged)."
+          }
+        },
+        {
+          "name": "Capture (single partial delivery)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"partialDeliveryId\": \"{{partialDeliveryId}}\",\n  \"amount\": 49.95,\n  \"currency\": \"EUR\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-delivery/capture",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-delivery", "capture"]
+            },
+            "description": "Target one specific partial-delivery row instead of the whole order."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generic DAL CRUD (partial_delivery entity)",
+      "item": [
+        {
+          "name": "Search partial deliveries",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filter\": [\n    { \"type\": \"equals\", \"field\": \"orderId\", \"value\": \"{{orderId}}\" }\n  ],\n  \"limit\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/search/partial-delivery",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "partial-delivery"]
+            },
+            "description": "Standard Shopware DAL search over the partial_delivery entity."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Legacy admin-UI endpoints",
+      "item": [
+        {
+          "name": "Create partial shipment (legacy)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partialDeliveries\": [\n    {\n      \"orderLineItemId\": \"{{orderLineItemId}}\",\n      \"quantity\": 1,\n      \"package\": \"Package 1\",\n      \"trackingCode\": \"DHL12sad31e279\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-shipment-delivery",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-shipment-delivery"]
+            },
+            "description": "Original endpoint powering the admin Shipments tab. Kept for backward compatibility."
+          }
+        },
+        {
+          "name": "Update partial shipment (legacy)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partialDeliveries\": [\n    {\n      \"orderLineItemId\": \"{{orderLineItemId}}\",\n      \"quantity\": 2,\n      \"package\": \"Package 1\",\n      \"trackingCode\": \"DHL12sad31e279\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-shipment-delivery/update/{{partialDeliveryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-shipment-delivery", "update", "{{partialDeliveryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get partial shipment (legacy)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-shipment-delivery/{{partialDeliveryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-shipment-delivery", "{{partialDeliveryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete partial shipment (legacy)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/_action/partial-shipment-delivery/delete/{{partialDeliveryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "_action", "partial-shipment-delivery", "delete", "{{partialDeliveryId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

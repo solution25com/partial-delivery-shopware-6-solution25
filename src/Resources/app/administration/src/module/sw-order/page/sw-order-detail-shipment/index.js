@@ -136,7 +136,6 @@ Component.register('sw-order-detail-shipment', {
                     };
                 })
                 .filter(item => item.shipments.length > 0);
-                console.log('Loaded shipments:', this.shipments);
 
         
             } catch (error) {
